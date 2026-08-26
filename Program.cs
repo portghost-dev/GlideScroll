@@ -28,10 +28,6 @@ internal static class Program
 
         ApplicationConfiguration.Initialize();
 
-        // Resolve licensing once at startup (reads a signed receipt from disk if
-        // present; no network). Future paid features gate on License.IsPro.
-        GlideScroll.Licensing.License.Initialize();
-
         // Warm up the WebView2 environment in the background BEFORE the user
         // opens the settings window. CoreWebView2Environment.CreateAsync takes
         // 200-600ms cold; doing it preemptively at process start hides that

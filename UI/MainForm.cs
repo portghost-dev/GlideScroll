@@ -203,6 +203,7 @@ public sealed class MainForm : Form
                 case "optimize-pan":       HandleOptimizePan(); break;
                 case "restore-defaults":   HandleRestoreDefaults(root); break;
                 case "capture-start":      HandleCaptureStart(root); break;
+                case "open-url":           HandleOpenUrl(root); break;
 
                 // Frameless title bar
                 case "titlebar-drag":      HandleTitlebarDrag(); break;
@@ -386,6 +387,8 @@ public sealed class MainForm : Form
                 case "general.screenDiagonalInches":
                     _config.General.ScreenDiagonalInches = Math.Clamp(value.GetDouble(), 10.0, 65.0);
                     break;
+                case "general.supporterName": _config.General.SupporterName = (value.GetString() ?? "").Trim(); break;
+                case "general.supporterOrder": _config.General.SupporterOrder = (value.GetString() ?? "").Trim(); break;
 
                 default: return false;
             }
@@ -473,6 +476,25 @@ public sealed class MainForm : Form
     private string _pendingCls = "";
     private string _pendingApp = "";
     private bool _pendingOk = false;
+
+    /// <summary>Opens the buy page in the system browser. Deliberately not a
+    /// general-purpose URL opener: only the one known URL is accepted, so a
+    /// compromised page script can't launch arbitrary targets.</summary>
+    private void HandleOpenUrl(JsonElement root)
+    {
+        string url = root.TryGetProperty("url", out var u) ? (u.GetString() ?? "") : "";
+        if (url != "https://portghost.com/buy")
+        {
+            System.Diagnostics.Debug.WriteLine($"open-url rejected: {url}");
+            return;
+        }
+        try
+        {
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch { /* no browser available; nothing sensible to do */ }
+    }
 
     private void HandleCaptureStart(JsonElement root)
     {

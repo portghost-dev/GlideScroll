@@ -756,6 +756,41 @@ button.subtle:hover {
 }
 
 .general-rows { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+
+/* ----- supporter surface (Preferences SUPPORT section + honor dialog) ----- */
+.support-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 14px;
+  min-height: 90px;
+  display: flex;
+  gap: 10px;
+}
+.support-panel.state-a { align-items: flex-start; }
+.support-panel.state-b { align-items: center; }
+/* Direct child only: the heart. The buy button's icon must inherit the
+   button's own color or it renders accent-on-accent and disappears. */
+.support-panel > .ti { width: 15px; height: 15px; flex-shrink: 0; color: var(--accent); }
+.support-panel.state-a > .ti { margin-top: 2px; }
+/* .ti sets fill:none + stroke; the filled heart inverts that. */
+.ti-heart-filled { fill: currentColor; stroke: none; }
+.support-text { flex: 1; min-width: 0; }
+.support-title { font-size: 13px; color: var(--text); }
+.support-sub { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+.support-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.support-actions button.primary {
+  display: flex; align-items: center; gap: 6px; justify-content: center;
+}
+.support-actions button.primary .ti { width: 13px; height: 13px; }
+.support-panel .trunc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Stacks above #prefs-modal (z 100), which stays open behind it. */
+#supporter-modal { z-index: 110; }
+.support-field-label  { font-size: 13px; color: var(--text); margin-bottom: 6px; }
+.support-field-labels { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+.support-field-labels .support-field-label { margin-bottom: 0; }
+.support-field-opt    { font-size: 11px; color: var(--text-muted); }
+.support-field input[type="text"] { width: 100%; height: 30px; }
 .mode-option:not(.active) .mode-check { visibility: hidden; }
 
 /* ----- picker modal ----- */
@@ -1098,7 +1133,7 @@ button.primary:disabled:hover { filter: none; }
   </div>
   <div class="footer">
     <button class="subtle" data-action="reset-wheel">Reset wheel defaults</button>
-    <span>GlideScroll v1.3 by PortGhost</span>
+    <span>GlideScroll v1.3.1 by PortGhost</span>
   </div>
 </div>
 
@@ -1184,7 +1219,7 @@ button.primary:disabled:hover { filter: none; }
   </div>
   <div class="footer">
     <button class="subtle" data-action="reset-pan">Reset pan defaults</button>
-    <span>GlideScroll v1.3 by PortGhost</span>
+    <span>GlideScroll v1.3.1 by PortGhost</span>
   </div>
 </div>
 
@@ -1219,7 +1254,7 @@ button.primary:disabled:hover { filter: none; }
   </div>
   <div class="footer">
     <span>Both lists persist independently.</span>
-    <span>GlideScroll v1.3 by PortGhost</span>
+    <span>GlideScroll v1.3.1 by PortGhost</span>
   </div>
 </div>
 
@@ -1285,9 +1320,44 @@ button.primary:disabled:hover { filter: none; }
         <label class="checkbox-row"><input type="checkbox" data-key="general.minimizeToTrayOnClose">Minimize to tray on close</label>
         <label class="checkbox-row"><input type="checkbox" data-key="general.showNotificationOnModeToggle">Show notification when adding apps</label>
       </div>
+
+      <div class="section-label" style="margin-left:0; margin-top:18px; margin-bottom:10px">SUPPORT</div>
+      <!-- Rendered by renderSupportPanel(): State A (invite) or State B
+           (acknowledgment), derived solely from general.supporterName. -->
+      <div id="support-root"></div>
     </div>
     <div class="modal-footer">
       <button data-close="prefs-modal">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Honor dialog. Opens OVER Preferences (see #supporter-modal z-index);
+     nothing here validates anything, by design. -->
+<div class="modal hidden" id="supporter-modal">
+  <div class="modal-card" style="width: min(420px, calc(100% - 40px))">
+    <div class="modal-header">
+      <span class="title"><i class="ti ti-heart"></i>Supporter details</span>
+      <span class="close" data-close="supporter-modal"><i class="ti ti-x"></i></span>
+    </div>
+    <div class="modal-body">
+      <p class="modal-intro">GlideScroll takes your word for it. Nothing here is checked and nothing is sent anywhere. What you enter is saved to your config and shown in Preferences.</p>
+      <div class="support-field" style="margin-bottom:12px">
+        <div class="support-field-label">Name for your license</div>
+        <input type="text" id="supporter-name" placeholder="Your name or username">
+      </div>
+      <div class="support-field">
+        <div class="support-field-labels">
+          <span class="support-field-label">Order number or license key</span>
+          <span class="support-field-opt">optional, nothing reads it</span>
+        </div>
+        <input type="text" id="supporter-order" placeholder="Paste either one">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="subtle" id="supporter-clear" style="margin-right:auto">Clear</button>
+      <button data-close="supporter-modal">Cancel</button>
+      <button class="primary" id="supporter-save" disabled>Save</button>
     </div>
   </div>
 </div>
@@ -1430,7 +1500,11 @@ const ICON_PATHS = {
   'gauge':            '<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M13.41 10.59l2.59 -2.59"/><path d="M7 12a5 5 0 0 1 5 -5"/>',
   'feather':          '<path d="M4 20l10 -10m0 -5v5h5m-9 -1v5h5m-9 -1v5h5m-5 -5l4 -4l4 -4"/><path d="M19 10c.638 -.636 1 -1.515 1 -2.486a3.515 3.515 0 0 0 -3.517 -3.514c-.97 0 -1.847 .367 -2.483 1m-3 13l4 -4l4 -4"/>',
   'cloud':            '<path d="M6.657 18c-2.572 0 -4.657 -2.007 -4.657 -4.483c0 -2.475 2.085 -4.482 4.657 -4.482c.393 -1.762 1.794 -3.2 3.675 -3.773c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.913 0 3.464 1.56 3.464 3.486c0 1.927 -1.551 3.487 -3.465 3.487h-11.878"/>',
-  'device-gamepad':   '<path d="M2 8a2 2 0 0 1 2 -2h16a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2l0 -8"/><path d="M6 12h4m-2 -2v4"/><path d="M15 11l0 .01"/><path d="M18 13l0 .01"/>'
+  'device-gamepad':   '<path d="M2 8a2 2 0 0 1 2 -2h16a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2l0 -8"/><path d="M6 12h4m-2 -2v4"/><path d="M15 11l0 .01"/><path d="M18 13l0 .01"/>',
+  'heart':            '<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566z"/>',
+  'heart-filled':     '<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566z"/>',
+  'pencil':           '<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/>',
+  'external-link':    '<path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M11 13l9 -9"/><path d="M15 4h5v5"/>'
 };
 
 /// <summary>Returns an inline SVG string for the named Tabler icon, with
@@ -1737,6 +1811,8 @@ function applyPanMode(value, persist) {
 function bindAllControls() {
   if (!config) return;
   suppress = true;
+
+  renderSupportPanel();
 
   $$('input[data-key]').forEach(el => {
     const key = el.dataset.key;
@@ -2270,6 +2346,129 @@ $('#gm-point').addEventListener('pointerdown', e => {
 
 
 // ----- C# message handling -----
+// ----- supporter surface (SUPPORT section + honor dialog) -----
+// Honor system: State B renders purely because a name is stored. Nothing is
+// checked, nothing is sent anywhere; the order field is never parsed.
+
+function supporterState() {
+  return (config?.general?.supporterName || '').trim().length > 0 ? 'b' : 'a';
+}
+
+function renderSupportPanel() {
+  const root = $('#support-root');
+  if (!root) return;
+  if (supporterState() === 'b') {
+    const name = config.general.supporterName.trim();
+    const order = (config.general.supporterOrder || '').trim();
+    root.innerHTML = `
+      <div class="support-panel state-b">
+        ${iconHtml('heart-filled')}
+        <div class="support-text">
+          <div class="support-title trunc">Licensed to ${esc(name)}</div>
+          ${order ? `<div class="support-sub trunc" style="margin-top:3px">${esc(order)}</div>` : ''}
+          <div class="support-sub">Thank you for supporting GlideScroll.</div>
+        </div>
+        <div class="support-actions">
+          <button class="subtle" id="support-edit">${iconHtml('pencil')}Edit</button>
+        </div>
+      </div>`;
+  } else {
+    root.innerHTML = `
+      <div class="support-panel state-a">
+        ${iconHtml('heart')}
+        <div class="support-text">
+          <div class="support-title">Support GlideScroll</div>
+          <div class="support-sub" style="margin-top:3px">Free and fully unlocked. Pay what you want if it earned it.</div>
+        </div>
+        <div class="support-actions">
+          <button class="primary" id="support-buy">${iconHtml('external-link')}Open buy page</button>
+          <button class="subtle" id="support-enter">Already supported</button>
+        </div>
+      </div>`;
+  }
+}
+
+// The Clear button exists in the DOM only when a name was stored at open
+// time (spec 6.3); we detach/reattach the same node rather than hide it.
+const supporterClearBtn = $('#supporter-clear');
+let supporterReturnFocus = null;
+
+function openSupporterDialog(triggerBtn) {
+  supporterReturnFocus = triggerBtn || null;
+  const nameEl = $('#supporter-name');
+  const orderEl = $('#supporter-order');
+  const hasName = supporterState() === 'b';
+  nameEl.value = hasName ? config.general.supporterName : '';
+  orderEl.value = hasName ? (config.general.supporterOrder || '') : '';
+  const footer = $('#supporter-modal .modal-footer');
+  if (hasName) {
+    if (!supporterClearBtn.parentElement) footer.insertBefore(supporterClearBtn, footer.firstChild);
+  } else {
+    supporterClearBtn.remove();
+  }
+  $('#supporter-save').disabled = nameEl.value.trim().length === 0;
+  $('#supporter-modal').classList.remove('hidden');
+  nameEl.focus();
+  if (hasName) nameEl.select();
+}
+
+function closeSupporterDialog() {
+  $('#supporter-modal').classList.add('hidden');
+  if (supporterReturnFocus && document.contains(supporterReturnFocus)) supporterReturnFocus.focus();
+  supporterReturnFocus = null;
+}
+
+function saveSupporter(name, order) {
+  config.general.supporterName = name;
+  config.general.supporterOrder = order;
+  send('set', { key: 'general.supporterName', value: name });
+  send('set', { key: 'general.supporterOrder', value: order });
+  closeSupporterDialog();
+  renderSupportPanel();
+}
+
+// Panel buttons re-render with their panel, so delegate from the stable root.
+document.addEventListener('click', e => {
+  if (e.target.closest('#support-buy')) {
+    send('open-url', { url: 'https://portghost.com/buy' });
+  } else if (e.target.closest('#support-enter')) {
+    openSupporterDialog(e.target.closest('#support-enter'));
+  } else if (e.target.closest('#support-edit')) {
+    openSupporterDialog(e.target.closest('#support-edit'));
+  } else if (e.target.closest('#supporter-save')) {
+    if (!$('#supporter-save').disabled)
+      saveSupporter($('#supporter-name').value.trim(), $('#supporter-order').value.trim());
+  } else if (e.target.closest('#supporter-clear')) {
+    saveSupporter('', '');
+  } else if (e.target.closest('[data-close="supporter-modal"]')) {
+    // The generic closer already hid the modal; this restores focus.
+    closeSupporterDialog();
+  }
+});
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'supporter-name')
+    $('#supporter-save').disabled = e.target.value.trim().length === 0;
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !$('#supporter-modal').classList.contains('hidden')) {
+    if (e.target.id === 'supporter-name' || e.target.id === 'supporter-order') {
+      if (!$('#supporter-save').disabled)
+        saveSupporter($('#supporter-name').value.trim(), $('#supporter-order').value.trim());
+    }
+  } else if (e.key === 'Escape') {
+    // Close the topmost open modal only. The supporter dialog stacks above
+    // Preferences, so it always goes first.
+    if (!$('#supporter-modal').classList.contains('hidden')) {
+      closeSupporterDialog();
+    } else {
+      const open = $$('.modal:not(.hidden)');
+      if (open.length) open[open.length - 1].classList.add('hidden');
+    }
+  }
+});
+
 window.chrome.webview.addEventListener('message', e => {
   let msg;
   try { msg = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; }

@@ -89,8 +89,6 @@ GlideScroll/
 │   ├── Autostart.cs           # HKCU Run registry helper
 │   ├── DisplayInfo.cs         # refresh-rate + resolution detection, per-engine tuning
 │   └── SystemTheme.cs         # Windows light/dark detection
-├── Licensing/
-│   └── LicenseVerifier.cs     # offline signed-receipt check (no network, no expiry)
 └── UI/
     ├── MainForm.cs            # frameless host window for the WebView2 page
     ├── WebUI.cs               # the settings page (HTML/CSS/JS as a C# raw string)

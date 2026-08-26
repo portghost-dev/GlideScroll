@@ -493,6 +493,11 @@ public sealed class GeneralConfig
     public bool AutostartWithWindows { get; set; } = true;
     public bool MinimizeToTrayOnClose { get; set; } = true;
     public bool ShowNotificationOnModeToggle { get; set; } = false;
+
+    // Honor-system supporter details, shown in Preferences. Free text, never
+    // parsed or validated; an empty name means the invite panel renders.
+    public string SupporterName { get; set; } = "";
+    public string SupporterOrder { get; set; } = "";
     /// <summary>Physical screen diagonal in inches. Used by "Optimize for monitor"
     /// to compute true PPI and scale step size so the per-notch scroll distance
     /// feels consistent across resolutions. Default 27" (modern gaming sweet spot).</summary>
@@ -592,6 +597,12 @@ public sealed class AppConfig
         Pan.MinStepPixels = Math.Clamp(Pan.MinStepPixels, 1, 50);
         Pan.Smoothness = Math.Clamp(Pan.Smoothness, 0.0, 20.0);
         General.ScreenDiagonalInches = Math.Clamp(General.ScreenDiagonalInches, 10.0, 65.0);
+        // Free text but bounded so a corrupt config can't balloon the file;
+        // the UI truncates display with an ellipsis well before this.
+        General.SupporterName = (General.SupporterName ?? "").Trim();
+        General.SupporterOrder = (General.SupporterOrder ?? "").Trim();
+        if (General.SupporterName.Length > 200) General.SupporterName = General.SupporterName[..200];
+        if (General.SupporterOrder.Length > 200) General.SupporterOrder = General.SupporterOrder[..200];
     }
 
     public static string ConfigPath => Path.Combine(
