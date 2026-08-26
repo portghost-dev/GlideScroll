@@ -2,6 +2,8 @@
 
 Smooth wheel scrolling and middle-button pan for Windows, by PortGhost.
 
+**[Download the latest release](../../releases/latest)**, unzip, run `GlideScroll.exe`. No installer, no admin rights, nothing written outside its own config folder. Windows 10 22H2 or Windows 11.
+
 ![Scrolling tab](docs/screenshots/scrolling-tab.png)
 
 ## What it does
@@ -115,12 +117,17 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 
 ## Install / autostart
 
-1. Copy the published `GlideScroll.exe` somewhere stable (e.g. `C:\Tools\GlideScroll\`).
+1. Grab the zip from [Releases](../../releases/latest) (or build it yourself, above) and copy `GlideScroll.exe` somewhere stable (e.g. `C:\Tools\GlideScroll\`).
 2. Run it once. Tray icon appears.
 3. Open Settings (double-click the tray icon), gear icon, check **Auto-start with Windows**. The autostart registry entry self-heals if the EXE moves.
-4. If SmartScreen flags the EXE, that is a false positive common to single-file .NET executables that install low-level hooks; add a Defender exclusion for the EXE path.
+4. If SmartScreen warns about an unknown publisher, that is the normal fate of small unsigned tools; use "More info" then "Run anyway", and check the download's SHA256 against the one published on the release if you want certainty. If Defender flags the EXE outright, that is a false positive common to single-file .NET executables that install low-level hooks; add an exclusion for the EXE path.
+5. The settings window renders in WebView2, which ships with Windows 11 and with Edge on Windows 10. In the rare case the settings window will not open, install the WebView2 Evergreen Runtime from Microsoft.
 
 Config lives at `%LOCALAPPDATA%\GlideScroll\config.json`. Deleting it restores factory defaults on next start. See the included user guide for a full tour.
+
+## Support
+
+GlideScroll is free and fully unlocked. If it earned it, there is a pay-what-you-want page at [portghost.com/buy](https://portghost.com/buy), and a matching Support panel in the app's Preferences where supporters get thanked by name. That is the entire monetization: no locked features, no trial, no nag.
 
 ## License
 

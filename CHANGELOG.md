@@ -1,5 +1,13 @@
 # GlideScroll Changelog
 
+## v1.3.1
+
+### Support GlideScroll, if you feel like it
+
+- **A new SUPPORT panel in Preferences.** GlideScroll stays free and fully unlocked. If it earned it, "Open buy page" takes you to the pay-what-you-want page in your browser, and "Already supported" lets you enter your name and, optionally, your order number. The app takes your word for it: nothing is checked, nothing is sent anywhere, and the panel simply thanks you by name from then on.
+- **The Preferences window is wider and better organized.** General settings and the new Support panel now sit side by side, so everything fits on screen without scrolling.
+- This is the only change in this release. Scrolling, panning, Game Mode, and themes are untouched.
+
 ## v1.3
 
 ### Game Mode: GlideScroll now steps aside for your games
