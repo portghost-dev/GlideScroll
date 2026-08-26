@@ -758,32 +758,64 @@ button.subtle:hover {
 .general-rows { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 
 /* ----- supporter surface (Preferences SUPPORT section + honor dialog) ----- */
+/* GENERAL and SUPPORT pair into one two-column row (spec v1.1 2.3). */
+.prefs-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-top: 0;
+}
+/* 1fr's implied min-width:auto lets a long unbreakable supporter name blow
+   the SUPPORT cell past its column and crush GENERAL; pin the minimum so
+   the columns stay equal and the ellipsis rules downstream can act. */
+.prefs-pair > * { min-width: 0; }
 .support-panel {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 12px 14px;
-  min-height: 90px;
+  padding: 10px 14px;
+  height: 132px;              /* FIXED, not min-height: both states measure this */
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
 }
-.support-panel.state-a { align-items: flex-start; }
-.support-panel.state-b { align-items: center; }
-/* Direct child only: the heart. The buy button's icon must inherit the
-   button's own color or it renders accent-on-accent and disappears. */
-.support-panel > .ti { width: 15px; height: 15px; flex-shrink: 0; color: var(--accent); }
-.support-panel.state-a > .ti { margin-top: 2px; }
+/* Size for all panel icons; color only for the head's heart. The buy
+   button's icon must inherit the button's own color or it renders
+   accent-on-accent and disappears (carried fix from spec v1.0). */
+.support-panel .ti { width: 15px; height: 15px; flex-shrink: 0; }
+.support-head .ti { color: var(--accent); }
 /* .ti sets fill:none + stroke; the filled heart inverts that. */
 .ti-heart-filled { fill: currentColor; stroke: none; }
-.support-text { flex: 1; min-width: 0; }
-.support-title { font-size: 13px; color: var(--text); }
-.support-sub { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
-.support-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.support-head { display: flex; align-items: center; gap: 8px; }
+.support-name { flex: 1; min-width: 0; font-size: 13px; color: var(--text);
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.support-sub  { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+.support-actions { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
 .support-actions button.primary {
   display: flex; align-items: center; gap: 6px; justify-content: center;
+  padding: 6px 10px;
 }
 .support-actions button.primary .ti { width: 13px; height: 13px; }
-.support-panel .trunc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.support-foot {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: auto; padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.support-key {
+  flex: 1; min-width: 0;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 11px; color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.support-edit {
+  width: 24px; height: 24px; margin-right: -4px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: transparent; border-radius: 3px;
+  color: var(--text-muted); cursor: pointer;
+}
+.support-edit:hover { background: var(--hover); color: var(--text); }
+.support-edit .ti { width: 14px; height: 14px; color: currentColor; }
 /* Stacks above #prefs-modal (z 100), which stays open behind it. */
 #supporter-modal { z-index: 110; }
 .support-field-label  { font-size: 13px; color: var(--text); margin-bottom: 6px; }
@@ -1262,7 +1294,7 @@ button.primary:disabled:hover { filter: none; }
 
 <!-- PREFERENCES MODAL -->
 <div class="modal hidden" id="prefs-modal">
-  <div class="modal-card" style="width: min(480px, calc(100% - 40px))">
+  <div class="modal-card" style="width: min(594px, calc(100% - 40px))">
     <div class="modal-header">
       <span class="title"><i class="ti ti-settings"></i>Preferences</span>
       <span class="close" data-close="prefs-modal"><i class="ti ti-x"></i></span>
@@ -1314,17 +1346,22 @@ button.primary:disabled:hover { filter: none; }
         </div>
       </div>
 
-      <div class="section-label" style="margin-left:0; margin-top:18px; margin-bottom:10px">GENERAL</div>
-      <div class="general-rows">
-        <label class="checkbox-row"><input type="checkbox" data-key="general.autostartWithWindows">Auto-start with Windows</label>
-        <label class="checkbox-row"><input type="checkbox" data-key="general.minimizeToTrayOnClose">Minimize to tray on close</label>
-        <label class="checkbox-row"><input type="checkbox" data-key="general.showNotificationOnModeToggle">Show notification when adding apps</label>
+      <div class="prefs-pair">
+        <div>
+          <div class="section-label" style="margin:0 0 10px">GENERAL</div>
+          <div class="general-rows">
+            <label class="checkbox-row"><input type="checkbox" data-key="general.autostartWithWindows">Auto-start with Windows</label>
+            <label class="checkbox-row"><input type="checkbox" data-key="general.minimizeToTrayOnClose">Minimize to tray on close</label>
+            <label class="checkbox-row"><input type="checkbox" data-key="general.showNotificationOnModeToggle">Show notification when adding apps</label>
+          </div>
+        </div>
+        <div>
+          <div class="section-label" style="margin:0 0 10px">SUPPORT</div>
+          <!-- Rendered by renderSupportPanel(): State A (invite) or State B
+               (acknowledgment), derived solely from general.supporterName. -->
+          <div id="support-root"></div>
+        </div>
       </div>
-
-      <div class="section-label" style="margin-left:0; margin-top:18px; margin-bottom:10px">SUPPORT</div>
-      <!-- Rendered by renderSupportPanel(): State A (invite) or State B
-           (acknowledgment), derived solely from general.supporterName. -->
-      <div id="support-root"></div>
     </div>
     <div class="modal-footer">
       <button data-close="prefs-modal">Close</button>
@@ -2360,26 +2397,30 @@ function renderSupportPanel() {
   if (supporterState() === 'b') {
     const name = config.general.supporterName.trim();
     const order = (config.general.supporterOrder || '').trim();
+    // Information order is deliberate: name, then the thank-you as the
+    // actual message, then the key demoted to hairline-footer metadata.
+    // The footer renders even with an empty key so the layout never shifts.
     root.innerHTML = `
       <div class="support-panel state-b">
-        ${iconHtml('heart-filled')}
-        <div class="support-text">
-          <div class="support-title trunc">Licensed to ${esc(name)}</div>
-          ${order ? `<div class="support-sub trunc" style="margin-top:3px">${esc(order)}</div>` : ''}
-          <div class="support-sub">Thank you for supporting GlideScroll.</div>
+        <div class="support-head">
+          ${iconHtml('heart-filled')}
+          <span class="support-name">Licensed to ${esc(name)}</span>
         </div>
-        <div class="support-actions">
-          <button class="subtle" id="support-edit">${iconHtml('pencil')}Edit</button>
+        <div class="support-sub">Thank you for supporting GlideScroll.</div>
+        <div class="support-foot">
+          <span class="support-key">${esc(order)}</span>
+          <button class="support-edit" id="support-edit"
+                  title="Edit or clear" aria-label="Edit supporter details">${iconHtml('pencil')}</button>
         </div>
       </div>`;
   } else {
     root.innerHTML = `
       <div class="support-panel state-a">
-        ${iconHtml('heart')}
-        <div class="support-text">
-          <div class="support-title">Support GlideScroll</div>
-          <div class="support-sub" style="margin-top:3px">Free and fully unlocked. Pay what you want if it earned it.</div>
+        <div class="support-head">
+          ${iconHtml('heart')}
+          <span class="support-name">Support GlideScroll</span>
         </div>
+        <div class="support-sub">Free and unlocked. Pay what you want.</div>
         <div class="support-actions">
           <button class="primary" id="support-buy">${iconHtml('external-link')}Open buy page</button>
           <button class="subtle" id="support-enter">Already supported</button>
