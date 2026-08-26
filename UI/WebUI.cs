@@ -758,24 +758,36 @@ button.subtle:hover {
 .general-rows { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 
 /* ----- supporter surface (Preferences SUPPORT section + honor dialog) ----- */
-/* GENERAL and SUPPORT pair into one two-column row (spec v1.1 2.3). */
+/* GENERAL sized to content, SUPPORT takes the remainder (spec v1.3 2.3).
+   The nowrap on checkbox rows is load-bearing: if real Segoe metrics run
+   wide, the auto column widens and SUPPORT yields instead of GENERAL
+   wrapping. */
 .prefs-pair {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   gap: 16px;
   align-items: start;
   margin-top: 0;
 }
+.prefs-pair .checkbox-row { white-space: nowrap; }
 /* 1fr's implied min-width:auto lets a long unbreakable supporter name blow
    the SUPPORT cell past its column and crush GENERAL; pin the minimum so
-   the columns stay equal and the ellipsis rules downstream can act. */
+   the ellipsis rules downstream can act. (No effect on the auto column,
+   which sizes to its content contribution regardless.) */
 .prefs-pair > * { min-width: 0; }
+/* The window is user-resizable below the default 634px. Under ~530px the
+   1fr track can no longer hold the panel's buttons; stack instead. The C#
+   window minimum (580px) keeps this from firing in practice; insurance. */
+@media (max-width: 530px) {
+  .prefs-pair { grid-template-columns: 1fr; }
+}
 .support-panel {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 10px 14px;
   height: 132px;              /* FIXED, not min-height: both states measure this */
+  overflow: hidden;           /* fixed height must fail gracefully, never spill */
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -790,7 +802,8 @@ button.subtle:hover {
 .support-head { display: flex; align-items: center; gap: 8px; }
 .support-name { flex: 1; min-width: 0; font-size: 13px; color: var(--text);
                 white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.support-sub  { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+.support-sub  { font-size: 11px; color: var(--text-muted); line-height: 1.5;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .support-actions { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
 .support-actions button.primary {
   display: flex; align-items: center; gap: 6px; justify-content: center;
@@ -1294,7 +1307,7 @@ button.primary:disabled:hover { filter: none; }
 
 <!-- PREFERENCES MODAL -->
 <div class="modal hidden" id="prefs-modal">
-  <div class="modal-card" style="width: min(594px, calc(100% - 40px))">
+  <div class="modal-card" style="width: min(556px, calc(100% - 40px))">
     <div class="modal-header">
       <span class="title"><i class="ti ti-settings"></i>Preferences</span>
       <span class="close" data-close="prefs-modal"><i class="ti ti-x"></i></span>
