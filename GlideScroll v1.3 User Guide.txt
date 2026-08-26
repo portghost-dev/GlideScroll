@@ -1,0 +1,169 @@
+==================================================
+          GlideScroll v1.3  User Guide
+==================================================
+
+In one sentence: GlideScroll makes your mouse wheel scroll
+smoothly instead of jumping line by line, and it turns your
+middle mouse button into a click-and-drag pan, like sliding a
+sheet of paper around the screen.
+
+You do not need to understand anything technical. Install it,
+use your computer normally, and adjust things only if you feel
+like it. The defaults are tuned to feel good out of the gate.
+
+
+--------------------------------------------------
+ GETTING STARTED
+--------------------------------------------------
+
+1. Find the GlideScroll icon in your system tray (bottom-right of
+   the screen, near the clock). You may need to click the small
+   "^" arrow to see it.
+
+2. Double-click the icon to open the Settings window. Right-click
+   it for a quick menu, including Exit to fully quit.
+
+3. GlideScroll runs quietly in the background and starts with
+   Windows. Set it and forget it.
+
+The Settings window has three tabs: Scrolling, Panning, and
+App rules.
+
+
+--------------------------------------------------
+ GAME MODE   (App rules tab)
+--------------------------------------------------
+
+On the App rules tab there is a button with a game controller
+icon: Game Mode. Click it to open the Game Mode window.
+
+What it does, in plain words: when Game Mode is on and you are in
+a game, GlideScroll pauses itself. The moment you are back on a
+normal window (your browser, Discord, a document), smooth
+scrolling picks right back up. You never have to touch anything.
+
+How it knows you are in a game: it recognizes well-known games by
+name (there is a list inside the Game Mode window, already filled
+in), it recognizes anti-cheat systems when they are running, and
+it recognizes fullscreen games in general. You can add any game it
+misses with "Browse for .exe" or by dragging "Point at a window"
+onto the running game.
+
+While you are in a game, scrolling feels exactly as if GlideScroll
+were not installed: weapon switching on the wheel stays instant
+and crisp, and GlideScroll stays completely clear of anti-cheat
+systems. With two monitors, a browser on the second screen stays
+smooth while the game runs on the first. Hover the tray icon while
+paused and the tooltip names the reason.
+
+Game Mode is on by default. If you never play games, you will
+simply never notice it.
+
+
+--------------------------------------------------
+ SCROLLING FEELS   (Scrolling tab)
+--------------------------------------------------
+
+The "Smoothing engine" dropdown changes how scrolling feels. The
+list is ordered roughly from most smoothed to least smoothed:
+
+  * LIQUID GLIDE - the smoothest, glides with inertia.
+  * SILK - the default. As smooth as Liquid Glide but it
+    settles quickly, no drifting after you stop.
+  * CADENCE - adapts to you: crisp when reading slowly, momentum
+    when you flick fast.
+  * SMOOTHED NOTCH - stock-style steps, but softened.
+  * NOTCH WITH GLIDE - stock-style steps with a mild glide.
+  * LOW LATENCY - minimal smoothing, fastest response.
+
+Try a few in your daily apps and pick what feels right; every
+engine responds to the sliders below it. Scroll one way then
+quickly flick the other: it stops cleanly instead of bouncing.
+
+The "Optimize for monitor" button reads your screen's refresh
+rate and resolution and tunes glide duration and step size to
+match. Worth one click on a new install.
+
+
+--------------------------------------------------
+ PANNING   (Panning tab)
+--------------------------------------------------
+
+Hold the MIDDLE mouse button (press the wheel straight down) and
+drag to pan around, like a touchpad.
+
+Two pan engines, picked from the dropdown at the top:
+
+  * FEATHER (default) - super light and immediate. The page sticks
+    to your hand and stops the instant you stop. Paper under your
+    palm.
+  * CUSHION - the softer, damped feel with a smoothing filter.
+    Heavier, more of a glide.
+
+With Flick mode on, release mid-drag and the page coasts to a
+stop; Coast Friction sets how quickly. A plain middle-click still
+works normally everywhere (opening links in new tabs, closing
+browser tabs), GlideScroll only takes over when you hold and drag.
+
+
+--------------------------------------------------
+ THEMES
+--------------------------------------------------
+
+Open the gear icon (top right of the settings window) to pick a
+look: Auto, Light, Dark, OLED Electric, Cozy Pink, Cozy Blue,
+Sakura Pop, Lavender Milk, Grid Graphite, Aizome Indigo, Neon
+Dusk, Cyan Circuit, Green Phosphor, Amber CRT, Abyss Glow, plus
+three Custom slots of your own. Auto follows your Windows
+light/dark setting.
+
+  - EVERY theme is editable. The six color boxes at the bottom of
+    Preferences always show the selected theme's colors; change
+    any of them and it saves by itself.
+  - The Reset button next to the theme dropdown puts ONLY the
+    currently selected theme back to its factory colors.
+  - Custom 1, 2, and 3 are three separate palettes you can build
+    from scratch. The color boxes accept hex (#FFFFFF or FFFFFF),
+    rgb(255,255,255), or a click on the swatch to open a picker.
+
+
+--------------------------------------------------
+ APP RULES   (App rules tab)
+--------------------------------------------------
+
+Two modes, and both lists are saved separately so switching modes
+never loses your work:
+
+  * EXCLUDE THESE APPS - GlideScroll runs everywhere except the
+    apps you list. This is the default, pre-loaded with the two
+    places Windows handles scrolling oddly (File Explorer and
+    Photo Viewer).
+  * ONLY RUN FOR THESE APPS - GlideScroll stays off everywhere
+    except the apps you list.
+
+Add apps with "Add running app", "Browse for .exe", or point at a
+window. You can also right-click the tray icon to instantly
+disable GlideScroll for whatever app is in the foreground.
+
+
+--------------------------------------------------
+ IF SOMETHING FEELS OFF
+--------------------------------------------------
+
+  - Scrolling feels wrong in one specific app: add that app on the
+    App rules tab and it goes back to stock behavior there.
+  - Want everything back to stock for a moment: right-click the
+    tray icon and pause or Exit. GlideScroll changes nothing
+    permanent on your system.
+  - A setting seems stuck: settings live in one file at
+    %LOCALAPPDATA%\GlideScroll\config.json. Deleting it returns
+    every setting to factory defaults on the next start.
+
+Found a bug or have an idea? Reports are very welcome on the
+project's GitHub page. The most helpful report is: which app you
+were in, what you did, what happened, and what you expected
+instead. "This felt weird" with an app name is plenty.
+
+Enjoy the glide.
+
+                                             PortGhost

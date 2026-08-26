@@ -1,0 +1,107 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>GlideScroll</RootNamespace>
+    <AssemblyName>GlideScroll</AssemblyName>
+    <Version>1.3.0</Version>
+    <Authors>PortGhost</Authors>
+    <Company>PortGhost</Company>
+    <Product>GlideScroll</Product>
+    <Description>Smooth scrolling and middle-button pan for Windows</Description>
+    <ApplicationIcon>Resources\glidescroll-white.ico</ApplicationIcon>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\glidescroll-white.ico" />
+    <EmbeddedResource Include="Resources\glidescroll-black.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Ship the third-party license notices as a loose file next to the exe in
+         every build and publish output (not bundled into the single-file exe). -->
+    <Content Include="THIRD-PARTY-NOTICES.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- No debug symbols in the shipped Release binary. Embedded symbols would
+         hand a decompiler the original method and local names for free. Debug
+         builds keep full symbols and stay fully debuggable. -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <!-- Compress the single-file bundle. ~35-50% size reduction in exchange
+         for a ~100ms one-time cold-start cost. -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <!-- Drop framework satellite assemblies (13 locale folders of WinForms
+         framework strings). Native dialogs may show English labels on
+         non-English Windows, app UI is HTML in WebView2 so unaffected. -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- Skip the ICU globalization data shipped with .NET. CultureInfo
+         operations use the invariant culture, fine for JSON config and the
+         WebView-hosted UI. -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!-- Strip the WPF runtime files that the Microsoft.Web.WebView2 package
+       drags in via its .Wpf assembly. We only use the WinForms variant. The
+       WebView2 native loader and the WinForms wrapper stay; PresentationFramework,
+       PresentationCore, WindowsBase, System.Xaml, ReachFramework, and the
+       WPF native graphics libraries get removed from the publish set.
+
+       The two-step "collect into a helper item, then remove" pattern is used
+       because MSBuild's inline-conditional Remove evaluates the condition once
+       (on the first item) rather than per-item. -->
+  <!-- PrepareForBundle copies _FilesToBundle into FilesToBundle, which is what
+       GenerateSingleFileBundle actually reads. We hook in AFTER that copy so
+       our removals affect the right collection. Earlier attempts modified
+       _FilesToBundle which is a no-op by this point. -->
+  <Target Name="StripUnusedWpfRuntime"
+          AfterTargets="PrepareForBundle"
+          BeforeTargets="GenerateSingleFileBundle">
+    <ItemGroup>
+      <!-- Prefix matches WPF-only families. Critically excludes the
+           System.Windows prefix because that would catch System.Windows.Forms
+           which is the entire app UI. The three System.Windows.*
+           WPF-only assemblies are listed in _WpfStripExact below. -->
+      <_WpfStripByPrefix Include="@(FilesToBundle)"
+        Condition="$([System.String]::Copy('%(FilesToBundle.Filename)').StartsWith('Presentation')) or
+                   $([System.String]::Copy('%(FilesToBundle.Filename)').StartsWith('UIAutomation')) or
+                   $([System.String]::Copy('%(FilesToBundle.Filename)').StartsWith('ReachFramework')) or
+                   $([System.String]::Copy('%(FilesToBundle.Filename)').StartsWith('System.Printing'))" />
+      <_WpfStripExact Include="@(FilesToBundle)"
+        Condition="'%(FilesToBundle.Filename)' == 'WindowsBase' or
+                   '%(FilesToBundle.Filename)' == 'System.Xaml' or
+                   '%(FilesToBundle.Filename)' == 'System.Windows.Controls.Ribbon' or
+                   '%(FilesToBundle.Filename)' == 'System.Windows.Input.Manipulations' or
+                   '%(FilesToBundle.Filename)' == 'System.Windows.Presentation' or
+                   '%(FilesToBundle.Filename)' == 'Microsoft.Web.WebView2.Wpf' or
+                   '%(FilesToBundle.Filename)' == 'D3DCompiler_47_cor3' or
+                   '%(FilesToBundle.Filename)' == 'wpfgfx_cor3' or
+                   '%(FilesToBundle.Filename)' == 'PenImc_cor3' or
+                   '%(FilesToBundle.Filename)' == 'vcruntime140_cor3' or
+                   '%(FilesToBundle.Filename)' == 'DirectWriteForwarder'" />
+      <_WpfStripXml Include="@(FilesToBundle)"
+        Condition="'%(FilesToBundle.Extension)' == '.xml'" />
+      <FilesToBundle Remove="@(_WpfStripByPrefix);@(_WpfStripExact);@(_WpfStripXml)" />
+    </ItemGroup>
+    <Message Importance="high" Text="StripUnusedWpfRuntime: FilesToBundle now has @(FilesToBundle-&gt;Count()) files (removed @(_WpfStripByPrefix-&gt;Count()) prefix + @(_WpfStripExact-&gt;Count()) exact + @(_WpfStripXml-&gt;Count()) xml)" />
+  </Target>
+
+</Project>

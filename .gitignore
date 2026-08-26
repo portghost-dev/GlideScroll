@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+dist/
+
+# Build logs
+*.binlog
+
+# Visual Studio / Rider / editors
+.vs/
+.idea/
+*.user
+*.suo
+
+# WebView2 runtime user data (should live in LocalAppData, ignore if it ever lands in-tree)
+**/WebView2/
+
+# OS cruft
+Thumbs.db
+desktop.ini

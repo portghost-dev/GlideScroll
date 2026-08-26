@@ -1,0 +1,7 @@
+# Normalize text line endings: store LF in the repo, check out native (CRLF on Windows).
+* text=auto
+
+# Binary assets, never normalize.
+*.ico binary
+*.png binary
+*.zip binary
