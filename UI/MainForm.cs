@@ -27,14 +27,34 @@ public sealed class MainForm : Form
     // config.json fsync is deferred.
     private System.Windows.Forms.Timer? _saveDebounceTimer;
 
+    // Window metrics in logical (96 DPI) pixels. This is the coordinate space
+    // the WebView2 page lays itself out in, so these must be scaled to
+    // physical pixels before use; see the constructor.
+    private const int LogicalWidth = 640;
+    private const int LogicalHeight = 620;
+    private const int LogicalMinWidth = 580;
+    private const int LogicalMinHeight = 540;
+
+    /// <summary>Converts a logical (96 DPI) size to physical pixels for the
+    /// monitor this window is currently on.</summary>
+    private Size ScaleToDpi(int width, int height)
+    {
+        float scale = DeviceDpi / 96f;
+        return new Size((int)Math.Round(width * scale), (int)Math.Round(height * scale));
+    }
+
     public MainForm(AppConfig config, ScrollPipeline pipeline)
     {
         _config = config;
         _pipeline = pipeline;
 
         Text = "GlideScroll";
-        MinimumSize = new Size(580, 540);
-        Size = new Size(640, 620);
+        // Scaled, not raw: the process is PerMonitorV2 aware, so WebView2
+        // renders the page at the monitor's scale factor. A raw 640px window
+        // on a 125% display gives the page a 512px viewport, which trips its
+        // narrow-layout breakpoint and makes the body scroll.
+        MinimumSize = ScaleToDpi(LogicalMinWidth, LogicalMinHeight);
+        Size = ScaleToDpi(LogicalWidth, LogicalHeight);
         StartPosition = FormStartPosition.CenterScreen;
         // Frameless: native chrome is gone; the title bar is drawn inside the
         // WebView2 (see WebUI.cs #titlebar). Window dragging, resize, snap,
@@ -48,6 +68,18 @@ public sealed class MainForm : Form
         catch { /* fall through to default form icon */ }
 
         BuildUi();
+    }
+
+    /// <summary>
+    /// Dragging between monitors with different scaling changes DeviceDpi. The
+    /// framework rescales the window itself from the suggested rectangle, but
+    /// MinimumSize is a value we set in physical pixels, so it has to be
+    /// recomputed or it keeps clamping at the previous monitor's scale.
+    /// </summary>
+    protected override void OnDpiChanged(DpiChangedEventArgs e)
+    {
+        base.OnDpiChanged(e);
+        MinimumSize = ScaleToDpi(LogicalMinWidth, LogicalMinHeight);
     }
 
     /// <summary>

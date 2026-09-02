@@ -1178,7 +1178,7 @@ button.primary:disabled:hover { filter: none; }
   </div>
   <div class="footer">
     <button class="subtle" data-action="reset-wheel">Reset wheel defaults</button>
-    <span>GlideScroll v1.3.1 by PortGhost</span>
+    <span>GlideScroll v1.3.2 by PortGhost</span>
   </div>
 </div>
 
@@ -1264,7 +1264,7 @@ button.primary:disabled:hover { filter: none; }
   </div>
   <div class="footer">
     <button class="subtle" data-action="reset-pan">Reset pan defaults</button>
-    <span>GlideScroll v1.3.1 by PortGhost</span>
+    <span>GlideScroll v1.3.2 by PortGhost</span>
   </div>
 </div>
 
@@ -1299,7 +1299,7 @@ button.primary:disabled:hover { filter: none; }
   </div>
   <div class="footer">
     <span>Both lists persist independently.</span>
-    <span>GlideScroll v1.3.1 by PortGhost</span>
+    <span>GlideScroll v1.3.2 by PortGhost</span>
   </div>
 </div>
 

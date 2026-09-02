@@ -1,5 +1,12 @@
 # GlideScroll Changelog
 
+## v1.3.2
+
+### Fixed: the settings window on scaled displays
+
+- **The settings window now sizes itself correctly when Windows display scaling is above 100 percent.** It previously opened at its unscaled size while its contents rendered at your display scale, so at 125 percent everything was squeezed into a window a quarter too small: the tabs looked cramped and squarish, the Preferences panel scrolled instead of fitting on one page, and content near the bottom was cut off. The window now scales with your display the way every other app on your desktop does, and follows along if you drag it between monitors that use different scaling.
+- Scrolling, panning, Game Mode, themes, and your saved settings are all untouched.
+
 ## v1.3.1
 
 ### Support GlideScroll, if you feel like it
